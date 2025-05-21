@@ -9,7 +9,6 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.12,<3.14"
-pydub = "^0.25.1"
 requests = "^2.32.3"
 yt-dlp = "^2024.12.13"
 black = "^24.10.0"
