@@ -1,14 +1,45 @@
 import os
+import traceback
 from yt_dlp import YoutubeDL
 
+
+def _progress_hook(status_dict):
+    status = status_dict.get("status")
+    if status == "downloading":
+        percent = (status_dict.get("_percent_str") or "").strip()
+        speed = (status_dict.get("_speed_str") or "").strip()
+        eta = (status_dict.get("_eta_str") or "").strip()
+        print(f"진행률 {percent} | 속도 {speed} | ETA {eta}")
+    elif status == "finished":
+        print("다운로드 완료, 후처리(변환/병합) 진행 중...")
 
 def download_youtube_audio(url, output_path="downloads/audio"):
     try:
         os.makedirs(output_path, exist_ok=True)
 
         ydl_opts = {
-            "format": "bestaudio/best",
+            "format": "140/bestaudio[ext=m4a][protocol!=m3u8]/bestaudio[protocol!=m3u8]/bestaudio/best",
             "outtmpl": os.path.join(output_path, "%(title)s.%(ext)s"),
+            "outtmpl_na_placeholder": "NA",
+            "noplaylist": True,
+            "restrictfilenames": True,
+            "continuedl": True,
+            "retries": 10,
+            "fragment_retries": 10,
+            "socket_timeout": 30,
+            "concurrent_fragment_downloads": 1,
+            "progress_hooks": [_progress_hook],
+            "ffmpeg_location": "/opt/homebrew/bin",
+            "quiet": False,
+            "verbose": True,
+            "hls_prefer_native": False,
+            "external_downloader": "ffmpeg",
+            "source_address": "0.0.0.0",
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android"],
+                }
+            },
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
@@ -26,6 +57,7 @@ def download_youtube_audio(url, output_path="downloads/audio"):
 
     except Exception as e:
         print(f"오디오 다운로드 중 에러 발생: {str(e)}")
+        traceback.print_exc()
         return None
 
 
@@ -34,8 +66,28 @@ def download_youtube_video(url, output_path="downloads/video"):
         os.makedirs(output_path, exist_ok=True)
 
         ydl_opts = {
-            "format": "bestvideo+bestaudio/best",
+            "format": "bestvideo[protocol!=m3u8]+bestaudio[protocol!=m3u8]/best[protocol!=m3u8]/best",
             "outtmpl": os.path.join(output_path, "%(title)s.%(ext)s"),
+            "outtmpl_na_placeholder": "NA",
+            "noplaylist": True,
+            "restrictfilenames": True,
+            "continuedl": True,
+            "retries": 10,
+            "fragment_retries": 10,
+            "socket_timeout": 30,
+            "concurrent_fragment_downloads": 1,
+            "progress_hooks": [_progress_hook],
+            "ffmpeg_location": "/opt/homebrew/bin",
+            "quiet": False,
+            "verbose": True,
+            "hls_prefer_native": False,
+            "external_downloader": "ffmpeg",
+            "source_address": "0.0.0.0",
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android"],
+                }
+            },
             "merge_output_format": "mp4",
         }
 
@@ -48,6 +100,7 @@ def download_youtube_video(url, output_path="downloads/video"):
 
     except Exception as e:
         print(f"비디오 다운로드 중 에러 발생: {str(e)}")
+        traceback.print_exc()
         return None
 
 

@@ -10,7 +10,8 @@ package-mode = false
 [tool.poetry.dependencies]
 python = ">=3.12,<3.14"
 requests = "^2.32.3"
-yt-dlp = "^2024.12.13"
+# yt-dlp는 YouTube 변경에 민감하므로 프리릴리스 허용으로 최신 대응을 받습니다
+yt-dlp = ">=2024.12.13"
 black = "^24.10.0"
 isort = "^5.13.2"
 
