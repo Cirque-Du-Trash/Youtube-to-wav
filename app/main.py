@@ -1,4 +1,5 @@
 import os
+import shutil
 import traceback
 from yt_dlp import YoutubeDL
 
@@ -29,17 +30,9 @@ def download_youtube_audio(url, output_path="downloads/audio"):
             "socket_timeout": 30,
             "concurrent_fragment_downloads": 1,
             "progress_hooks": [_progress_hook],
-            "ffmpeg_location": "/opt/homebrew/bin",
             "quiet": False,
             "verbose": True,
-            "hls_prefer_native": False,
-            "external_downloader": "ffmpeg",
-            "source_address": "0.0.0.0",
-            "extractor_args": {
-                "youtube": {
-                    "player_client": ["android"],
-                }
-            },
+            "hls_prefer_native": True,
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
@@ -47,6 +40,10 @@ def download_youtube_audio(url, output_path="downloads/audio"):
                 }
             ],
         }
+
+        ffmpeg_path = shutil.which("ffmpeg")
+        if ffmpeg_path:
+            ydl_opts["ffmpeg_location"] = os.path.dirname(ffmpeg_path)
 
         with YoutubeDL(ydl_opts) as ydl:
             print("오디오 다운로드 시작...")
@@ -77,19 +74,15 @@ def download_youtube_video(url, output_path="downloads/video"):
             "socket_timeout": 30,
             "concurrent_fragment_downloads": 1,
             "progress_hooks": [_progress_hook],
-            "ffmpeg_location": "/opt/homebrew/bin",
             "quiet": False,
             "verbose": True,
-            "hls_prefer_native": False,
-            "external_downloader": "ffmpeg",
-            "source_address": "0.0.0.0",
-            "extractor_args": {
-                "youtube": {
-                    "player_client": ["android"],
-                }
-            },
+            "hls_prefer_native": True,
             "merge_output_format": "mp4",
         }
+
+        ffmpeg_path = shutil.which("ffmpeg")
+        if ffmpeg_path:
+            ydl_opts["ffmpeg_location"] = os.path.dirname(ffmpeg_path)
 
         with YoutubeDL(ydl_opts) as ydl:
             print("비디오 다운로드 시작...")
