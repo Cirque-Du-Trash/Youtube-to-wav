@@ -32,7 +32,14 @@ def download_youtube_audio(url, output_path="downloads/audio"):
             "progress_hooks": [_progress_hook],
             "quiet": False,
             "verbose": True,
-            "hls_prefer_native": True,
+            "hls_prefer_native": False,
+            "external_downloader": "ffmpeg",
+            "source_address": "0.0.0.0",
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android"],
+                }
+            },
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
@@ -63,7 +70,8 @@ def download_youtube_video(url, output_path="downloads/video"):
         os.makedirs(output_path, exist_ok=True)
 
         ydl_opts = {
-            "format": "bestvideo[protocol!=m3u8]+bestaudio[protocol!=m3u8]/best[protocol!=m3u8]/best",
+            "format": "bestvideo+bestaudio/best",
+            "format_sort": ["res", "vcodec:vp9.2", "acodec:opus"],
             "outtmpl": os.path.join(output_path, "%(title)s.%(ext)s"),
             "outtmpl_na_placeholder": "NA",
             "noplaylist": True,
@@ -76,8 +84,14 @@ def download_youtube_video(url, output_path="downloads/video"):
             "progress_hooks": [_progress_hook],
             "quiet": False,
             "verbose": True,
-            "hls_prefer_native": True,
+            "source_address": "0.0.0.0",
             "merge_output_format": "mp4",
+            "postprocessor_args": {
+                "merger": [
+                    "-c:v", "h264_nvenc", "-preset", "p7", "-rc", "vbr", "-cq", "18",
+                    "-c:a", "aac", "-b:a", "192k",
+                ],
+            },
         }
 
         ffmpeg_path = shutil.which("ffmpeg")
@@ -109,4 +123,4 @@ if __name__ == "__main__":
     elif choice == "2":
         download_youtube_video(url)
     else:
-        print("잘못된 입력입니다. 1 또는 2를 입력해주세요.")
+        print("잘못된 입력입니다. 1 또는 2를 입력해주세요.")  
